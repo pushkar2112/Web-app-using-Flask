@@ -7,27 +7,47 @@ Register Page
 {% block content %}
 <!-- <h1>Register Form</h1>   -->
 <!-- {{ form }} -->
-    <div class='container'>
-        <form method="POST" class='form-register', style="color: white;">
-
-            <img class="mb-4" src="https://github.com/pushkar2112/Web-Dev/blob/main/CSS-MySite/images/computer.png" alt="">
-            <h1 class="h3 mb-3 font-weight-normal">
-                Please Create your Account
-            </h1>
-            <br>
-
-            {{ form.username.label() }}
-            {{ form.username(class='form-control', placeholder='User Name') }}
+    <body>
+        <div class='container'>
+            <form method="POST" class='form-register', style="color: white;">
+                {{ form.hidden_tag() }}
+    
+                <img class="mb-4" src="https://github.com/pushkar2112/Web-Dev/blob/main/CSS-MySite/images/computer.png?raw=true" alt="">
+                <h1 class="h3 mb-3 font-weight-normal">
+                    Please Create your Account
+                </h1>
+                <br>
+    
+                {{ form.username.label() }}
+                {{ form.username(class='form-control', placeholder='User Name') }}
+                
+                {{ form.email_address.label() }}
+                {{ form.email_address(class='form-control', placeholder='Email Address') }}
             
-            {{ form.email_address.label() }}
-            {{ form.email_address(class='form-control', placeholder='Email Address') }}
+                {{ form.password1.label() }}
+                {{ form.password1(class='form-control', placeholder='Password') }}
+            
+                {{ form.password2.label() }}
+                {{ form.password2(class='form-control', placeholder='Confirm Password') }}
+
+                <br>
+
+                {{ form.submit(class='btn btn-large btn-block btn-primary') }}
+            
+            </form>
+        </div>
+    </body>
+    <style>
+        /* body {
+            text-align: center;
+        } */
+
+        .mb-4 {
+            border-radius: 50%; 
+            width: 15%; 
+            padding-top: 5px;
+        }
         
-            {{ form.password1.label() }}
-            {{ form.password1(class='form-control', placeholder='Password') }}
-        
-            {{ form.password2.label() }}
-            {{ form.password2(class='form-control', placeholder='Confirm Password') }}
-        
-        </form>
-    </div>
+    </style>
+    
 {% endblock %}
