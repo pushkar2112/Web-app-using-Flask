@@ -1,25 +1,34 @@
 from Market import app
-from flask import render_template, redirect, url_for, flash
+from flask import render_template, redirect, url_for, flash, request
 from Market.models import Item, User
-from Market.forms import RegisterForm, LoginForm
+from Market.forms import RegisterForm, LoginForm, PurchaseItemForm, SellItemForm
 from Market import db
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 
 @app.route("/")
 @app.route("/home")
 def home_page():
     return render_template('home.html')
 
-@app.route('/market')
+@app.route('/market', methods=['GET','POST'])
 @login_required
 def market_page():
-    items = Item.query.all()
+    purchase_form = PurchaseItemForm()
+    if request.method == 'POST':
+        purchased_item = request.form.get('purchased_item')
+        p_item_object = Item.query.filter_by(name=purchased_item).first()
+        if p_item_object:
+            p_item_object.owner = current_user.id
+            current_user.budget -= p_item_object.price
+            db.session.commit()
+
+    items = Item.query.filter_by(owner=None)
     # [
     #     {'id': 1, 'name': 'Phone', 'barcode': '893212299897', 'price': 500},
     #     {'id': 2, 'name': 'Laptop', 'barcode': '123985473165', 'price': 900},
     #     {'id': 3, 'name': 'Keyboard', 'barcode': '231985128446', 'price': 150}
     # ]
-    return render_template('market.html', items=items)
+    return render_template('market.html', items=items, purchase_form=purchase_form)
 
 @app.route('/register', methods=['GET','POST'])
 def register_page():
