@@ -14,21 +14,31 @@ def home_page():
 @login_required
 def market_page():
     purchase_form = PurchaseItemForm()
+    selling_form = SellItemForm()
     if request.method == 'POST':
         purchased_item = request.form.get('purchased_item')
         p_item_object = Item.query.filter_by(name=purchased_item).first()
         if p_item_object:
-            p_item_object.owner = current_user.id
-            current_user.budget -= p_item_object.price
-            db.session.commit()
+            if current_user.can_purchase(p_item_object):
+                p_item_object.buy(current_user) # buy the item and assign ownership to the product
+                flash(f'Congratulations! You purchased {p_item_object.name} for {p_item_object.price}$.', category='success')
+            else:
+                flash(f'Unfortunately you do not have enough money to purchase {p_item_object.name}!', category='danger') 
+    # To get rid of the confirm form resubmission we need to differentiate between GET and POST request 
+    # and change the request method from POST to GET after completing the purchase of the item
+        return redirect(url_for('market_page'))
 
-    items = Item.query.filter_by(owner=None)
-    # [
-    #     {'id': 1, 'name': 'Phone', 'barcode': '893212299897', 'price': 500},
-    #     {'id': 2, 'name': 'Laptop', 'barcode': '123985473165', 'price': 900},
-    #     {'id': 3, 'name': 'Keyboard', 'barcode': '231985128446', 'price': 150}
-    # ]
-    return render_template('market.html', items=items, purchase_form=purchase_form)
+
+    if request.method == 'GET': # to get rid of confirm form resubmission from the screen
+        items = Item.query.filter_by(owner=None)
+        # [
+        #     {'id': 1, 'name': 'Phone', 'barcode': '893212299897', 'price': 500},
+        #     {'id': 2, 'name': 'Laptop', 'barcode': '123985473165', 'price': 900},
+        #     {'id': 3, 'name': 'Keyboard', 'barcode': '231985128446', 'price': 150}
+        # ]
+
+        owned_items = Item.query.filter_by(owner=current_user.id)
+        return render_template('market.html', items=items, purchase_form=purchase_form, owned_items=owned_items, selling_form=selling_form)
 
 @app.route('/register', methods=['GET','POST'])
 def register_page():
